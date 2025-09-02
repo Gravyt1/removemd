@@ -1,7 +1,7 @@
 # RemoveMD - Metadata Removal Tool
 
 **RemoveMD** is a modern, open-source, privacy-first tool to remove metadata from your files (images, videos, PDFs, audio, Office documents, and more).  
-This code is the one used on https://www.removemd.com/ without limitations.
+This code is the one used on www.removemd.com/ without limitations.
 
 It provides a clean web interface to **scrub your files** while ensuring:  
 - 🚫 **No file storage** (all processing happens in memory)  
