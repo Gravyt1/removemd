@@ -65,3 +65,5 @@ http://127.0.0.1:5000
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).  
 👉 See the [LICENSE](LICENSE) file for full details.
+
+(Sorry front-end developers, I did the front end with AI, because I'm not good at it)
