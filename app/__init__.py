@@ -11,5 +11,9 @@ def create_app():
     @app.route('/')
     def home():
         return render_template('index.html')
+    
+    @app.route('/analyzer')
+    def analyzer():
+        return render_template('analyzer.html')
 
     return app

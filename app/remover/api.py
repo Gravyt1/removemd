@@ -2,6 +2,7 @@ from flask import Blueprint, request, send_file, jsonify
 from .remover import remove_metadata
 from io import BytesIO
 import zipfile
+from werkzeug.utils import secure_filename
 
 # Create a Blueprint for API routes related to metadata removal
 api_remover_bp = Blueprint('api_remover', __name__)
@@ -24,12 +25,13 @@ def remove():
         # Handle single file output
         if isinstance(output, tuple):
             cleaned_content, mimetype, filename = output
-            filename = f"cleaned_{filename}"
+            safe_filename = secure_filename(filename)
+            download_name = f"cleaned_{safe_filename}"
             
             return send_file(
                 cleaned_content,
                 as_attachment=True,
-                download_name=filename,
+                download_name=download_name,
                 mimetype=mimetype
             )
 

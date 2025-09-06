@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="RemoveMD - Open source metadata analyzer tool. Check and view metadata from your files.">
+    <title>RemoveMD - Open Source Metadata Analyzer Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="/static/css/output.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.png">
+    <script src="/static/js/analyzer.js" defer></script>
+  </head>
+  <body>
+    <div id="webcrumbs">
+      <div class="bg-gradient-to-b from-gray-900 to-black min-h-screen text-gray-100 p-4">
+        <header class="mb-8">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
+                <span class="text-white font-bold text-lg"><img src="/static/img/logo.svg"></span>
+              </div>
+              <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600">
+                RemoveMD
+              </h1>
+            </div>
+            <nav class="flex items-center space-x-4">
+              <a href="{{ url_for('home') }}" class="text-gray-400 hover:text-primary-400 transition-colors duration-300 text-sm">
+                Home
+              </a>
+              <a href="https://github.com/Gravyt1/removemd" target="_blank" class="text-gray-400 hover:text-primary-400 transition-colors duration-300 text-sm">
+                GitHub
+              </a>
+              <a href="https://www.linkedin.com/in/jules-esnault-b84b32373" target="_blank" class="text-gray-400 hover:text-primary-400 transition-colors duration-300 text-sm">
+                Contact
+              </a>
+            </nav>
+          </div>
+        </header>
+
+        <main class="max-w-2xl mx-auto">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold mb-2">
+              Open Source Metadata Analyzer
+            </h2>
+            <p class="text-gray-300">
+              Check and view metadata from your files with our open source tool.
+            </p>
+          </div>
+
+          <div class="bg-gray-800 bg-opacity-50 p-6 rounded-2xl border border-gray-700 backdrop-filter backdrop-blur-sm">
+            <form id="analyzeForm" enctype="multipart/form-data">
+              <div
+                class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 transition-colors duration-300 cursor-pointer"
+                id="analyzeDropZone"
+              >
+                <span class="material-symbols-outlined text-4xl mb-3">upload_file</span>
+                <p class="text-gray-300 text-sm md:text-base">
+                  Drop your file here
+                </p>
+                <p class="text-xs md:text-sm text-gray-500 mt-2">
+                  or click to select a file
+                </p>
+                <input 
+                  type="file" 
+                  id="analyzeFileInput" 
+                  name="file" 
+                  accept=".jpg,.jpeg,.png,.tiff,.bmp,.gif,.webp,.pdf,.docx,.xlsx,.pptx,.mp3,.mp4"
+                  class="hidden"
+                >
+              </div>
+              
+              <div class="file-info mt-4 hidden" id="fileInfoContainer">
+                <p class="text-gray-300 text-sm mb-2">Selected file:</p>
+                <div class="flex justify-between items-center bg-gray-700 bg-opacity-50 p-3 rounded-lg">
+                  <span class="text-sm text-gray-300 truncate" id="fileName"></span>
+                  <button type="button" id="removeFileBtn" class="text-red-500 hover:text-red-400">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              </div>
+              
+              <button 
+                type="submit"
+                id="analyzeBtn"
+                class="w-full py-3 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg hover:from-primary-400 hover:to-primary-600 transition-all duration-300 font-semibold text-sm md:text-base mt-4"
+                disabled
+              >
+                Analyze Metadata Now
+              </button>
+            </form>
+          </div>
+
+          <!-- Empty State -->
+          <div class="bg-gray-800 bg-opacity-50 p-6 rounded-2xl border border-gray-700 backdrop-filter backdrop-blur-sm mt-6 text-center" id="emptyState">
+            <span class="material-symbols-outlined text-4xl text-gray-400 mb-3">search</span>
+            <p class="text-gray-300">No file analyzed yet</p>
+            <p class="text-sm text-gray-500 mt-1">Upload a file to analyze its metadata</p>
+          </div>
+
+          <!-- Results Section -->
+          <div class="bg-gray-800 bg-opacity-50 p-6 rounded-2xl border border-gray-700 backdrop-filter backdrop-blur-sm mt-6 hidden" id="resultsSection">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-300" id="resultTitle"></h3>
+              <span class="text-xs text-gray-400" id="resultStatus">No file analyzed</span>
+            </div>
+            
+            <!-- Error Container -->
+            <div id="errorContainer" class="hidden mb-4">
+              <div class="bg-red-900 bg-opacity-30 border border-red-800 rounded-lg p-4 text-center">
+                <span class="material-symbols-outlined text-red-400 text-lg mb-1">error</span>
+                <p class="text-red-300 text-sm" id="errorMessage"></p>
+              </div>
+            </div>
+            
+            <!-- Results Container -->
+            <div id="resultsContainer" class="hidden">
+              <div class="mb-4">
+                <h4 class="text-md font-medium text-gray-300 mb-2">File Information</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm" id="fileInfo">
+                  <!-- File info will be populated here -->
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="text-md font-medium text-gray-300 mb-2">Metadata Contents</h4>
+                <div class="bg-gray-900 bg-opacity-60 rounded-lg p-4 max-h-64 overflow-y-auto text-sm" id="metadataContent">
+                  <!-- Metadata will be populated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 text-center text-gray-400 text-sm">
+            <p>This is an open source tool. Your files are processed securely and never stored.</p>
+            <p class="mt-2">
+              <a href="{{ url_for('home') }}" class="text-primary-400 hover:text-primary-300">
+                ← Back to Metadata Removal
+              </a> • 
+              <a href="https://github.com/Gravyt1/removemd" target="_blank" class="text-primary-400 hover:text-primary-300">
+                View source code on GitHub
+              </a>
+            </p>
+          </div>
+        </main>
+        <footer class="mt-12 pt-6 border-t border-gray-800 text-center">
+          <p class="text-gray-500 text-sm">
+            © 2025 RemoveMD. Open source metadata tools.
+          </p>
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="{{ url_for('home') }}" class="text-gray-400 hover:text-primary-400 transition-colors duration-300 text-sm">
+              Home
+            </a>
+            <a href="https://github.com/Gravyt1" target="_blank" class="text-gray-400 hover:text-primary-400 transition-colors duration-300 text-sm">
+              GitHub
+            </a>
+            <a href="https://www.linkedin.com/in/jules-esnault-b84b32373" target="_blank" class="text-gray-400 hover:text-primary-400 transition-colors duration-300 text-sm">
+              LinkedIn
+            </a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
