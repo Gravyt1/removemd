@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "removemd"
+version = "0.1.0"
+description = "Remove metadata from images, PDFs, Office documents, audio, and video to protect your privacy."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Jules Esnault", email = "contact@removemd.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "docx==0.2.4",
+    "ffmpeg-python==0.2.0",
+    "mutagen==1.47.0",
+    "openpyxl==3.1.5",
+    "pillow==11.3.0",
+    "PyPDF2==3.0.1",
+    "python-docx==1.2.0",
+    "python-pptx==1.0.2",
+    "xlsxwriter==3.2.9"
+]
+
+[project.urls]
+Homepage = "https://removemd.com"
+Repository = "https://github.com/Gravyt1/removemd"
+LinkedIn = "https://www.linkedin.com/in/jules-esnault-b84b32373/"
+
+[project.scripts]
+removemd = "removemd.core:main"

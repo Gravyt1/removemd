@@ -1,69 +1,77 @@
-# RemoveMD - Metadata Removal Tool
+# 🧼 RemoveMD
 
-**RemoveMD** is a modern, open-source, privacy-first tool to remove metadata from your files (images, videos, PDFs, audio, Office documents, and more).  
-This code is the one used on www.removemd.com without limitations.
+🚀 **Protect your privacy by removing metadata from your files.**  
+Supports images, PDF documents, Office files, audio, and video.
 
-It provides a clean web interface to **scrub your files** while ensuring:  
-- 🚫 **No file storage** (all processing happens in memory)  
-- 🔒 **Anonymous usage** (no email required, anonymous IDs only)  
-- 📦 **Multi-format compatibility** (images, videos, audio, PDFs, Office documents, etc.)  
+## 🔒 Why RemoveMD?
 
----
+Metadata can contain sensitive information such as:
+- 📍 GPS location  
+- 🧑‍💼 Author name  
+- 📱 Device model  
+- 🕵️‍♂️ Technical details invisible to the naked eye  
 
-## ✨ Features
-- 🖼️ **Image Metadata Remover**: strip EXIF, GPS, and sensitive data from photos  
-- 📄 **PDF Metadata Scrubber**: securely clean hidden PDF metadata  
-- 🎥 **Video Metadata Cleaner**: anonymize your videos before sharing  
-- 🎧 **Audio Metadata Scrubber**: remove hidden tags from audio files  
-- 🏢 **Office Document Cleaner**: clean Word, Excel, and PowerPoint files  
-- 👀 **Metadata Viewer (coming soon)**  
+RemoveMD helps you clean all that up in seconds.
 
 ---
 
-## ⚙️ Installation
+## 🧰 Features
 
-### 1. Install FFmpeg
+- ✂️ Removes sensitive metadata (location, author, device, etc.)  
+- 📁 Batch processing (handle multiple files at once)  
+- 🖥️ Command-line interface (CLI) and Python library  
+- 🛡️ Open source and privacy-friendly  
 
-**Debian / Ubuntu**
+---
+
+## 📦 Installation
+
 ```bash
-sudo apt update
-sudo apt install ffmpeg -y
-```
-
-**macOS (Homebrew)**
-```bash
-brew install ffmpeg
-```
-
-**Windows**  
-Download FFmpeg from [ffmpeg.org](https://ffmpeg.org/), then add it to your PATH.
-
-### 2. Install Python dependencies
-```bash
-pip install -r requirements.txt
+pip install removemd
 ```
 
 ---
 
-## 🚀 Usage
+## ⚡ Usage
 
-Run the Flask server locally:
+### 🖥️ Command Line
+
 ```bash
-python run.py
+removemd file1.jpg file2.pdf file3.mp3
 ```
 
-Then open your browser at:
-```
-http://127.0.0.1:5000
-```
+➡️ This generates cleaned files like `cleaned_file1.jpg`, `cleaned_file2.pdf`, etc.
 
-➡️ Upload your files and download the cleaned versions without metadata.
+### 🐍 Python
+
+```python
+import removemd
+
+# Clean multiple files
+removemd.scrub_metadata(["image.jpg", "document.pdf"])
+
+# Analyze metadata from a file
+metadata = removemd.analyze_metadata("image.jpg")
+print(metadata)
+```
 
 ---
 
-## 📜 License
+## 🛠️ Development
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).  
-👉 See the [LICENSE](LICENSE) file for full details.
+```bash
+git clone https://github.com/Gravyt1/removemd.git
+cd removemd
+pip install -e .
+```
 
-Sorry front-end developers, I did the front end with AI, because I'm not good at it ):
+---
+
+## 🌐 Hosted Version
+
+👉 Try the online version at [removemd.com](https://removemd.com)  
+Unlimited processing, premium features, and an intuitive interface.
+You can support me by using this website.
+
+---
+
