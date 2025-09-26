@@ -9,11 +9,11 @@ from pptx import Presentation
 def strip_image(file, fmt):
     try:
         image = Image.open(file)
-        data = list(image.getdata())
-        cleaned_image = Image.new(image.mode, image.size)
-        cleaned_image.putdata(data)
         cleaned_image_io = BytesIO()
-        cleaned_image.save(cleaned_image_io, format=fmt)
+        if fmt.upper() == "JPEG":
+            image.save(cleaned_image_io, format=fmt, quality=95, optimize=True)
+        else:
+            image.save(cleaned_image_io, format=fmt)
         cleaned_image_io.seek(0)
         return cleaned_image_io
     except Exception as e:
