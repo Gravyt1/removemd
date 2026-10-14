@@ -1,8 +1,8 @@
-import argparse, json, os
+import argparse, json, os, sys
 from .utils import get_type_from_file
-from .services import clean_metadata, remove_metadata
+from .services import clean_metadata, remove_metadata, MetadataError
 
-def scrub_metadata(filepaths: list[str]) -> list[str]:
+def scrub_metadata(filepaths: "list[str]") -> "list[str]":
     """
     Remove metadata from a list of files and save the cleaned versions.
 
@@ -10,18 +10,23 @@ def scrub_metadata(filepaths: list[str]) -> list[str]:
         filepaths (list[str]): List of file paths to process.
 
     Returns:
-        list[str]: List of paths to the cleaned output files.
+        list[str]: List of paths to the cleaned output files, written next
+        to the originals as "cleaned_<name>".
+
+    Raises:
+        FileNotFoundError: If a file does not exist.
+        MetadataError: If a file is not supported or cannot be processed.
     """
+    if isinstance(filepaths, str):
+        filepaths = [filepaths]
     cleaned_files = []
 
     for filepath in filepaths:
         file_type, mimetype, fmt = get_type_from_file(filepath)
         output = remove_metadata(filepath, file_type, mimetype, fmt)
 
-        filename = os.path.basename(filepath)
-        name, ext = os.path.splitext(filename)
-
-        out_path = f"cleaned_{name}{ext}"
+        directory, filename = os.path.split(filepath)
+        out_path = os.path.join(directory, f"cleaned_{filename}")
         with open(out_path, "wb") as f:
             f.write(output.getvalue())
 
@@ -68,12 +73,29 @@ def main():
 
     args = parser.parse_args()
 
-    if args.mode == "remove":
-        cleaned_files = scrub_metadata(args.files)
-        for cf in cleaned_files:
-            print(f"✅ Cleaned file saved: {cf}")
-    else:
-        for f in args.files:
-            metadata = analyze_metadata(f)
-            print(f"📄 Metadata for {f}:")
-            print(json.dumps(metadata, indent=4, ensure_ascii=False))
+    # Windows consoles may not be able to print emojis or accented metadata.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")
+        except AttributeError:
+            pass
+
+    failures = 0
+    for f in args.files:
+        try:
+            if args.mode == "remove":
+                cf = scrub_metadata([f])[0]
+                print(f"✅ Cleaned file saved: {cf}")
+            else:
+                metadata = analyze_metadata(f)
+                print(f"📄 Metadata for {f}:")
+                print(json.dumps(metadata, indent=4, ensure_ascii=False, default=str))
+        except (OSError, MetadataError) as e:
+            failures += 1
+            print(f"❌ {f}: {e}", file=sys.stderr)
+
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -21,7 +21,7 @@ def get_type_from_file(filepath):
     
     
     # Extract file extension (without the dot) and convert to lowercase
-    ext = filename.split('.')[-1].lower()
+    ext = os.path.splitext(filename)[1].lstrip('.').lower()
     
     # Guess MIME type based on filename
     mimetype, _ = mimetypes.guess_type(filename)

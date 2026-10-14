@@ -1,35 +1,28 @@
-from .check import *
+from io import BytesIO
+from .check import check_image, check_pdf, check_office, check_audio, check_video
+from ..scrubber.strip import MetadataError
 
-def clean_metadata(file, file_type, mimetype, fmt):
-    """
-    Process metadata checking for a single uploaded file.
-    
-    Determines file type and applies appropriate stripping function.
-    Returns cleaned content and mimetype as a tuple.
-    """
 
-    # Handle unsupported file types
+def clean_metadata(filepath, file_type, mimetype, fmt):
+    """
+    Extract the metadata of a single file.
+
+    Returns a dict with the metadata. Raises MetadataError when the file
+    type is not supported.
+    """
     if file_type == 'not_supported':
-        return print(f"File type of {file.filename} is not supported for metadata checker.")
-    
-    # Process image files
-    elif file_type == 'image':
-        content_info = check_image(file)
+        raise MetadataError(f"File type of {filepath} is not supported for metadata checker.")
 
-    # Process PDF files
+    with open(filepath, "rb") as f:
+        file = BytesIO(f.read())
+
+    if file_type == 'image':
+        return check_image(file)
     elif file_type == 'pdf':
-        content_info = check_pdf(file)
-    
-    # Process office documents (Word, Excel, PowerPoint)
+        return check_pdf(file)
     elif file_type == 'office':
-        content_info = check_office(file, fmt)
-    
-    # Process audio files (audio/video)
+        return check_office(file, fmt)
     elif file_type == 'audio':
-        content_info = check_audio(file)
-
+        return check_audio(file)
     elif file_type == 'video':
-        content_info = check_video(file, fmt)
-    
-    # Return cleaned content and mimetype
-    return content_info
+        return check_video(file, fmt.lower())

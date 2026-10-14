@@ -5,7 +5,6 @@ from openpyxl import load_workbook
 from pptx import Presentation
 from mutagen import File as MutagenFile
 import tempfile, subprocess, os, json
-from PIL import Image, ExifTags
 
 def check_image(file):
     try:
@@ -22,7 +21,7 @@ def check_image(file):
                 meta["General Info"] = clean_info
 
         # EXIF metadata
-        exif_data = getattr(img, "_getexif", lambda: None)()
+        exif_data = img.getexif()
         if exif_data:
             exif = {}
             for tag_id, value in exif_data.items():
@@ -62,10 +61,10 @@ def check_office(file, fmt):
         else:
             return f"Unsupported Office format {fmt}"
         for attr in dir(core):
-            if not attr.startswith("_"):
+            if not attr.startswith("_") and attr not in ("tagname", "namespace", "idx_base"):
                 try:
                     value = getattr(core, attr)
-                    if value not in [None, ""]:
+                    if not callable(value) and value not in [None, ""]:
                         meta[attr] = str(value)
                 except:
                     pass
@@ -80,7 +79,7 @@ def check_audio(file):
         meta = {}
         if media and media.tags:
             for k, v in media.tags.items():
-                meta[k] = str(v)
+                meta[str(k)] = str(v)
         return {"metadata": meta if meta else "No metadata found"}
     except Exception:
         return "Error checking audio metadata"
@@ -93,22 +92,27 @@ def check_video(file, fmt):
             temp_name = temp.name
 
         cmd = [
-            "ffprobe", "-v", "quiet", "-print_format", "json",
+            "ffprobe", "-protocol_whitelist", "file", "-v", "quiet", "-print_format", "json",
             "-show_format", "-show_streams", temp_name
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        os.unlink(temp_name)
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True,
+                                    stdin=subprocess.DEVNULL, timeout=60)
+        finally:
+            os.unlink(temp_name)
 
         if result.returncode == 0:
             data = json.loads(result.stdout)
+            fmt_info = data.get("format", {})
             meta = {
-                "filename": data["format"]["filename"],
-                "duration": float(data["format"]["duration"]),
-                "size": int(data["format"]["size"]),
-                "bit_rate": int(data["format"]["bit_rate"]),
+                "format": fmt_info.get("format_long_name"),
+                "duration": float(fmt_info["duration"]) if fmt_info.get("duration") else None,
+                "size": int(fmt_info["size"]) if fmt_info.get("size") else None,
+                "bit_rate": int(fmt_info["bit_rate"]) if fmt_info.get("bit_rate") else None,
+                "tags": fmt_info.get("tags", {}),
                 "streams": []
             }
-            for s in data["streams"]:
+            for s in data.get("streams", []):
                 stream_meta = {
                     "index": s.get("index"),
                     "codec_type": s.get("codec_type"),
@@ -118,9 +122,10 @@ def check_video(file, fmt):
                     "bit_rate": int(s["bit_rate"]) if s.get("bit_rate") else None,
                     "duration": float(s["duration"]) if s.get("duration") else None,
                     "r_frame_rate": s.get("r_frame_rate"),
+                    "tags": s.get("tags"),
                 }
                 meta["streams"].append({k:v for k,v in stream_meta.items() if v is not None})
-            return {"metadata": meta}
+            return {"metadata": {k: v for k, v in meta.items() if v not in (None, {})}}
         else:
             return "Error extracting video metadata"
     except Exception as e:
